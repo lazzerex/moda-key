@@ -27,6 +27,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         lastName: true,
         role: true,
         isVerified: true,
+        addresses: {
+          select: {
+            id: true,
+            street: true,
+            city: true,
+            state: true,
+            zipCode: true,
+            country: true,
+            isDefault: true,
+          },
+        },
       },
     });
 
