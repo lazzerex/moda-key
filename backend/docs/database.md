@@ -264,10 +264,10 @@ The seed script populates the database with realistic sample data for developmen
 #### Users (4 total)
 | Role | Email | Password | Verified |
 |------|-------|----------|----------|
-| Admin | admin@modakey.com | password123 | ✅ Yes |
-| Customer | john.doe@example.com | password123 | ✅ Yes |
-| Customer | jane.smith@example.com | password123 | ✅ Yes |
-| Vendor | vendor@modakey.com | password123 | ✅ Yes |
+| Admin | admin@modakey.com | password123 | Yes |
+| Customer | john.doe@example.com | password123 |  Yes |
+| Customer | jane.smith@example.com | password123 |  Yes |
+| Vendor | vendor@modakey.com | password123 |  Yes |
 
 #### Product Catalog
 - **4 Brands**: Keychron, Ducky, GMMK, Drop
