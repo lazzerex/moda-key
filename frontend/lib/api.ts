@@ -76,6 +76,55 @@ export interface Cart {
   };
 }
 
+export interface Order {
+  id: string;
+  orderNumber: string;
+  status: string;
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  discount: number;
+  total: number;
+  createdAt: string;
+  items: OrderItem[];
+}
+
+export interface OrderItem {
+  id: string;
+  quantity: number;
+  priceAtPurchase: number;
+  productVariant: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface PaymentIntent {
+  clientSecret: string;
+  paymentIntentId: string;
+  status: string;
+  paymentId: string;
+}
+
+export interface UserAddress {
+  id: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  isDefault: boolean;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  addresses?: UserAddress[];
+}
+
 class ApiClient {
   private baseURL: string;
   private token: string | null = null;
@@ -98,6 +147,7 @@ class ApiClient {
     this.token = null;
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('refreshToken');
     }
   }
@@ -165,8 +215,23 @@ class ApiClient {
     }
   }
 
-  async getCurrentUser() {
-    return this.request('/auth/me', { method: 'GET' });
+  async getCurrentUser(): Promise<User> {
+    return this.request<User>('/auth/me', { method: 'GET' });
+  }
+
+  // User/Address endpoints
+  async createAddress(data: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    isDefault?: boolean;
+  }): Promise<UserAddress> {
+    return this.request<UserAddress>('/profile/addresses', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   // Product endpoints
@@ -229,6 +294,47 @@ class ApiClient {
   async clearCart(): Promise<void> {
     return this.request<void>('/cart', {
       method: 'DELETE',
+    });
+  }
+
+  // Order endpoints
+  async getOrders(): Promise<Order[]> {
+    return this.request<Order[]>('/orders');
+  }
+
+  async getOrder(id: string): Promise<Order> {
+    return this.request<Order>(`/orders/${id}`);
+  }
+
+  async createOrder(data: {
+    shippingAddressId: string;
+    billingAddressId?: string;
+    paymentMethod: 'CREDIT_CARD' | 'PAYPAL' | 'BANK_TRANSFER' | 'COD';
+    couponCode?: string;
+  }): Promise<Order> {
+    return this.request<Order>('/orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async cancelOrder(id: string, reason: string): Promise<Order> {
+    return this.request<Order>(`/orders/${id}/cancel`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    });
+  }
+
+  // Payment endpoints
+  async createPaymentIntent(data: {
+    orderId: string;
+    amount: number;
+    currency?: string;
+    idempotencyKey?: string;
+  }): Promise<PaymentIntent> {
+    return this.request<PaymentIntent>('/payments/create-intent', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 }
