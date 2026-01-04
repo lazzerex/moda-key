@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Product } from '@/lib/api';
+import Header from './components/Header';
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,26 +28,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              MODAKey
-            </Link>
-            <nav className="flex gap-6">
-              <Link href="/products" className="text-gray-700 hover:text-gray-900">
-                Products
-              </Link>
-              <Link href="/cart" className="text-gray-700 hover:text-gray-900">
-                Cart
-              </Link>
-              <Link href="/auth/login" className="text-gray-700 hover:text-gray-900">
-                Login
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
