@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import * as express from 'express';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -53,6 +54,10 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+
+  // Configure raw body parsing for Stripe webhooks only
+  // The webhook route will be: <apiPrefix>/payments/webhook
+  app.use(`${apiPrefix}/payments/webhook`, express.raw({ type: 'application/json' }));
 
   // Graceful shutdown
   app.enableShutdownHooks();
