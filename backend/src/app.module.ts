@@ -14,6 +14,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AdminModule } from './modules/admin/admin.module';
     PaymentsModule,
     ReviewsModule,
     AdminModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
