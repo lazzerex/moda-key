@@ -4,15 +4,33 @@ Production-grade mechanical keyboard store backend API built with NestJS, Prisma
 
 ## Description
 
-A comprehensive e-commerce backend system for a mechanical keyboard store featuring JWT authentication, product management with Redis caching, shopping cart functionality, order processing, and role-based access control. Built with modern TypeScript framework and production-ready architecture.
+A comprehensive e-commerce backend system for a mechanical keyboard store featuring JWT authentication, product management with Redis caching, shopping cart functionality, order processing with Stripe payments, product reviews, inventory management, and role-based access control. Built with modern TypeScript framework and production-ready architecture.
 
 ## Features Implemented
 
-- **Authentication & Authorization** - JWT with refresh tokens, role-based access control (CUSTOMER, ADMIN, VENDOR)
-- **Products Management** - CRUD operations, product variants, Redis caching, advanced search and filtering
-- **Shopping Cart** - Add/update/remove items, stock validation, persistent carts for authenticated users
-- **Orders & Payments** - Order creation, tracking, and history (basic structure)
-- **Infrastructure** - PostgreSQL database, Redis caching, Bull queue for background jobs, Swagger documentation
+- ✅ **Authentication & Authorization** - JWT with refresh tokens, role-based access control (CUSTOMER, ADMIN, VENDOR)
+- ✅ **Products Management** - CRUD operations, product variants, Redis caching, advanced search and filtering
+- ✅ **Shopping Cart** - Add/update/remove items, stock validation, persistent carts for authenticated users
+- ✅ **Orders & Payments** - Complete order processing with Stripe integration and webhook handling
+- ✅ **Reviews System** - Product reviews, ratings, helpful votes, and moderation
+- ✅ **Inventory Management** - Stock tracking with concurrency control
+- ✅ **Admin Panel** - Dashboard with analytics and comprehensive management tools
+- ✅ **Infrastructure** - PostgreSQL database, Redis caching, Bull queue for background jobs, Swagger documentation
+
+## Documentation
+
+Comprehensive documentation is available in the [docs/](./docs) directory:
+
+- **[API Quick Reference](./docs/API_QUICK_REFERENCE.md)** - Complete API endpoint reference with examples
+- **[Payment Testing Guide](./docs/PAYMENT_TESTING_GUIDE.md)** - How to test Stripe payment integration
+- **[Payment Implementation](./docs/PAYMENTS_IMPLEMENTATION_SUMMARY.md)** - Payment module architecture details
+- **[Database Reference](./docs/QUICK_DATABASE_REFERENCE.md)** - Database commands, queries, and seed data
+- **[Admin Implementation](./docs/ADMIN_IMPLEMENTATION_SUMMARY.md)** - Admin features overview
+- **[Admin Quick Reference](./docs/ADMIN_QUICK_REFERENCE.md)** - Admin API endpoints
+- **[Admin API Documentation](./docs/admin-api.md)** - Detailed admin API documentation
+- **[Backend Architecture](./docs/backend.md)** - Architecture patterns and design decisions
+- **[Database Documentation](./docs/database.md)** - Database schema and relationships
+- **[Reviews Implementation](./docs/reviews-implementation.md)** - Reviews system details
 
 ## Tech Stack
 
@@ -96,7 +114,11 @@ Once the application is running, you can access:
 - **Swagger Documentation**: http://localhost:3000/api/docs
 - **Health Check**: http://localhost:3000/api/v1/health
 
-## API Endpoints Reference
+## Quick API Reference
+
+For detailed API documentation with request/response examples, see [docs/API_QUICK_REFERENCE.md](./docs/API_QUICK_REFERENCE.md).
+
+### Key Endpoints Overview
 
 ### Authentication Endpoints
 
@@ -149,265 +171,44 @@ Once the application is running, you can access:
 
 - `GET /admin/dashboard` - Get dashboard statistics (users, orders, products counts)
 
-## API Testing Guide
+For more details, see:
+- [API Quick Reference](./docs/API_QUICK_REFERENCE.md) - Complete endpoint documentation
+- [Admin API Documentation](./docs/admin-api.md) - Admin-specific endpoints
+- [Payment Testing Guide](./docs/PAYMENT_TESTING_GUIDE.md) - Payment flow testing
 
-### Setting Up for Testing
+## Database Schema
 
-1. Ensure the application is running:
-```bash
-docker-compose up -d
-npm run start:dev
-```
+## Database Schema
 
-2. The API will be available at `http://localhost:3000/api/v1`
+The application uses a comprehensive schema with 20+ models including:
 
-### Testing Authentication Flow
+- Users & Authentication (User, RefreshToken, UserAddress)
+- Product Catalog (Product, ProductVariant, Brand, Category)
+- Shopping (Cart, CartItem, Order, OrderItem)
+- Inventory Management (Inventory, InventoryLog)
+- Payments (Payment)
+- Reviews (Review, ReviewImage, ReviewVote)
+- Promotions (Coupon, UserCoupon)
 
-#### 1. Register a New User
+View complete schema: [prisma/schema.prisma](./prisma/schema.prisma)
 
-```bash
-curl -X POST http://localhost:3000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john.doe@example.com",
-    "password": "SecurePass123!",
-    "firstName": "John",
-    "lastName": "Doe"
-  }'
-```
-
-**Expected Response** (201 Created):
-```json
-{
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "clx123...",
-    "email": "john.doe@example.com",
-    "firstName": "John",
-    "lastName": "Doe",
-    "role": "CUSTOMER"
-  }
-}
-```
-
-#### 2. Login
-
-```bash
-curl -X POST http://localhost:3000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john.doe@example.com",
-    "password": "SecurePass123!"
-  }'
-```
-
-**Save the `accessToken` from the response for subsequent requests.**
-
-#### 3. Get Current User Profile
-
-```bash
-curl -X GET http://localhost:3000/api/v1/auth/me \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-#### 4. Refresh Access Token
-
-```bash
-curl -X POST http://localhost:3000/api/v1/auth/refresh \
-  -H "Content-Type: application/json" \
-  -d '{
-    "refreshToken": "YOUR_REFRESH_TOKEN"
-  }'
-```
-
-### Testing Product Endpoints
-
-#### 1. List Products with Filters
-
-```bash
-# Basic listing with pagination
-curl -X GET "http://localhost:3000/api/v1/products?page=1&limit=20"
-
-# With filters
-curl -X GET "http://localhost:3000/api/v1/products?minPrice=50&maxPrice=200&search=keyboard"
-
-# Filter by brand or category
-curl -X GET "http://localhost:3000/api/v1/products?brandId=BRAND_ID&categoryId=CATEGORY_ID"
-```
-
-#### 2. Search Products
-
-```bash
-curl -X GET "http://localhost:3000/api/v1/products/search?q=mechanical&limit=10"
-```
-
-#### 3. Get Product Details
-
-```bash
-curl -X GET http://localhost:3000/api/v1/products/PRODUCT_ID
-```
-
-#### 4. Create Product (Admin/Vendor Only)
-
-```bash
-curl -X POST http://localhost:3000/api/v1/products \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Keychron K2 Pro",
-    "slug": "keychron-k2-pro",
-    "description": "A premium wireless mechanical keyboard",
-    "basePrice": 99.99,
-    "sku": "KEY-K2-PRO",
-    "brandId": "BRAND_ID",
-    "categoryId": "CATEGORY_ID"
-  }'
-```
-
-#### 5. Create Product Variant
-
-```bash
-curl -X POST http://localhost:3000/api/v1/products/PRODUCT_ID/variants \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Gateron Brown Switches",
-    "sku": "KEY-K2-PRO-GB",
-    "price": 99.99,
-    "stock": 50,
-    "switchType": "Gateron Brown",
-    "layout": "75%",
-    "color": "Space Gray",
-    "connection": "Wireless"
-  }'
-```
-
-### Testing Shopping Cart
-
-#### 1. Add Item to Cart
-
-```bash
-curl -X POST http://localhost:3000/api/v1/cart/items \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "productVariantId": "VARIANT_ID",
-    "quantity": 2
-  }'
-```
-
-#### 2. Get Cart
-
-```bash
-curl -X GET http://localhost:3000/api/v1/cart \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-**Expected Response**:
-```json
-{
-  "id": "cart_id",
-  "userId": "user_id",
-  "items": [
-    {
-      "id": "item_id",
-      "quantity": 2,
-      "priceAtAdd": 99.99,
-      "productVariant": {
-        "id": "variant_id",
-        "name": "Gateron Brown Switches",
-        "product": {
-          "name": "Keychron K2 Pro"
-        }
-      }
-    }
-  ],
-  "summary": {
-    "itemCount": 1,
-    "subtotal": 199.98
-  }
-}
-```
-
-#### 3. Update Cart Item Quantity
-
-```bash
-curl -X PUT http://localhost:3000/api/v1/cart/items/CART_ITEM_ID \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "quantity": 3
-  }'
-```
-
-#### 4. Remove Item from Cart
-
-```bash
-curl -X DELETE http://localhost:3000/api/v1/cart/items/CART_ITEM_ID \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-#### 5. Clear Cart
-
-```bash
-curl -X DELETE http://localhost:3000/api/v1/cart \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-### Testing Order Endpoints
-
-#### 1. Get User Orders
-
-```bash
-curl -X GET http://localhost:3000/api/v1/orders \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-#### 2. Get Order Details
-
-```bash
-curl -X GET http://localhost:3000/api/v1/orders/ORDER_ID \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-### Testing Admin Endpoints
-
-**Note**: User must have ADMIN role to access these endpoints.
-
-```bash
-curl -X GET http://localhost:3000/api/v1/admin/dashboard \
-  -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
-```
-
-### Common HTTP Status Codes
-
-- `200 OK` - Successful GET, PUT, or DELETE request
-- `201 Created` - Successful POST request creating a resource
-- `204 No Content` - Successful DELETE request with no response body
-- `400 Bad Request` - Invalid request data or validation error
-- `401 Unauthorized` - Missing or invalid authentication token
-- `403 Forbidden` - Authenticated but lacking required permissions
-- `404 Not Found` - Resource does not exist
-- `409 Conflict` - Resource already exists (e.g., duplicate email)
-- `500 Internal Server Error` - Server-side error
-
-### Error Response Format
-
-All errors follow a consistent format:
-
-```json
-{
-  "statusCode": 400,
-  "message": "Validation failed",
-  "error": "Bad Request"
-}
-```
+For database management commands and queries, see [docs/QUICK_DATABASE_REFERENCE.md](./docs/QUICK_DATABASE_REFERENCE.md).
 
 ## Project Structure
 
 ```
 backend/
+├── docs/                      # Documentation files
+│   ├── API_QUICK_REFERENCE.md
+│   ├── PAYMENT_TESTING_GUIDE.md
+│   ├── PAYMENTS_IMPLEMENTATION_SUMMARY.md
+│   ├── QUICK_DATABASE_REFERENCE.md
+│   ├── ADMIN_IMPLEMENTATION_SUMMARY.md
+│   ├── ADMIN_QUICK_REFERENCE.md
+│   ├── admin-api.md
+│   ├── backend.md
+│   ├── database.md
+│   └── reviews-implementation.md
 ├── src/
 │   ├── modules/
 │   │   ├── auth/              # Authentication & JWT
@@ -415,8 +216,9 @@ backend/
 │   │   ├── cart/              # Shopping cart operations
 │   │   ├── orders/            # Order management
 │   │   ├── inventory/         # Stock management
-│   │   ├── payments/          # Payment processing
+│   │   ├── payments/          # Payment processing (Stripe)
 │   │   ├── reviews/           # Product reviews
+│   │   ├── users/             # User management
 │   │   └── admin/             # Admin-only endpoints
 │   ├── common/
 │   │   ├── guards/            # Authentication & authorization guards
@@ -426,11 +228,11 @@ backend/
 │   ├── prisma/                # Database service & client
 │   ├── redis/                 # Redis cache service
 │   ├── queue/                 # Bull queue configuration
-│   ├── config/                # Configuration files
 │   ├── app.module.ts          # Root application module
 │   └── main.ts                # Application entry point
 ├── prisma/
 │   ├── schema.prisma          # Database schema definition
+│   ├── seed.ts                # Database seeding script
 │   └── migrations/            # Database migration files
 ├── test/                      # E2E test files
 ├── docker-compose.yml         # Docker services configuration
@@ -467,7 +269,7 @@ The application uses the following main database models:
 - `InventoryLog` - Inventory change history
 
 ### Payments
-- `Payment` - Payment transactions
+- `Payment` - Payment transactions (Stripe integration)
 
 ### Reviews & Promotions
 - `Review` - Product reviews and ratings
@@ -477,6 +279,8 @@ The application uses the following main database models:
 - `UserCoupon` - Coupon usage tracking
 
 View complete schema: [prisma/schema.prisma](./prisma/schema.prisma)
+
+For database management, see [docs/QUICK_DATABASE_REFERENCE.md](./docs/QUICK_DATABASE_REFERENCE.md).
 
 ## Docker Services
 
@@ -605,16 +409,14 @@ npm run test:e2e
 
 ## Upcoming Features
 
-- Advanced inventory management with concurrency handling
-- Complete order processing with database transactions
-- Payment gateway integration (Stripe)
-- Email notification system
-- Comprehensive database seeding script
-- Unit and E2E test coverage (80%+)
+- Email notification system with Bull queue
 - Advanced product search with Elasticsearch
-- Product image upload functionality
-- Coupon and discount system implementation
-- Review moderation system
+- Product image upload and optimization
+- Complete coupon/discount system implementation
+- Enhanced review moderation tools
+- Shipping integration (FedEx, UPS, USPS)
+- Wishlist functionality
+- Product comparison tool
 
 ## Resources
 

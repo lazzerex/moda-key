@@ -7,7 +7,15 @@ Complete e-commerce platform for mechanical keyboards built with NestJS backend 
 ```
 moda-key/
 ├── backend/          # NestJS REST API
-└── frontend/         # Next.js web application
+│   ├── docs/         # Backend documentation (API, database, payment guides)
+│   ├── prisma/       # Database schema and migrations
+│   └── src/          # Source code
+├── frontend/         # Next.js web application
+│   ├── docs/         # Frontend documentation
+│   ├── app/          # Next.js app directory
+│   └── lib/          # Utilities and API client
+├── project-prompt.md # Original project specification
+└── todo.md           # Development todo list
 ```
 
 ## Quick Start
@@ -98,45 +106,44 @@ docker-compose down
 ## Features
 
 ### Implemented
-- User authentication (register, login, JWT)
-- Product catalog with variants
-- Shopping cart functionality
-- Redis caching for products
-- Role-based access control (CUSTOMER, ADMIN, VENDOR)
-- API documentation (Swagger)
-- Responsive UI
+- ✅ User authentication (register, login, JWT with refresh tokens)
+- ✅ Product catalog with variants and Redis caching
+- ✅ Shopping cart functionality
+- ✅ Order processing with transactions
+- ✅ Payment integration (Stripe) with webhook handling
+- ✅ Product reviews and ratings system
+- ✅ Inventory management with concurrency control
+- ✅ Role-based access control (CUSTOMER, ADMIN, VENDOR)
+- ✅ Admin panel with analytics and management
+- ✅ API documentation (Swagger)
+- ✅ Responsive UI with Tailwind CSS
 
-### Coming Soon
-- Order processing with transactions
-- Payment integration (Stripe)
-- Inventory management with concurrency control
-- Product reviews and ratings
-- Email notifications
-- Admin dashboard
-- Product search
-- Order history
+### In Progress
+- Order email notifications
+- Advanced product search and filtering
+- Coupon/discount system
+- Product image upload
 
-## API Documentation
+## Documentation
 
-Once the backend is running, visit http://localhost:3000/api/docs for complete interactive API documentation.
+The project includes comprehensive documentation organized in dedicated `docs/` folders:
 
-### Key Endpoints
+### Backend Documentation (backend/docs/)
+- [API Quick Reference](backend/docs/API_QUICK_REFERENCE.md) - Complete API endpoint reference
+- [Payment Testing Guide](backend/docs/PAYMENT_TESTING_GUIDE.md) - How to test Stripe integration
+- [Payment Implementation Summary](backend/docs/PAYMENTS_IMPLEMENTATION_SUMMARY.md) - Payment module details
+- [Quick Database Reference](backend/docs/QUICK_DATABASE_REFERENCE.md) - Database commands and queries
+- [Admin Implementation Summary](backend/docs/ADMIN_IMPLEMENTATION_SUMMARY.md) - Admin features overview
+- [Admin Quick Reference](backend/docs/ADMIN_QUICK_REFERENCE.md) - Admin API endpoints
+- [Admin API Documentation](backend/docs/admin-api.md) - Detailed admin API docs
+- [Backend Architecture](backend/docs/backend.md) - Architecture and design patterns
+- [Database Documentation](backend/docs/database.md) - Database schema and relationships
+- [Reviews Implementation](backend/docs/reviews-implementation.md) - Reviews system details
 
-**Authentication**
-- `POST /api/v1/auth/register` - Register new user
-- `POST /api/v1/auth/login` - Login
-- `GET /api/v1/auth/me` - Get current user
+### Frontend Documentation (frontend/docs/)
+- [Testing Guide](frontend/docs/TESTING_GUIDE.md) - Frontend testing workflows
 
-**Products**
-- `GET /api/v1/products` - List products
-- `GET /api/v1/products/:id` - Get product details
-- `POST /api/v1/products` - Create product (Admin)
-
-**Cart**
-- `GET /api/v1/cart` - Get cart
-- `POST /api/v1/cart/items` - Add to cart
-- `PUT /api/v1/cart/items/:id` - Update quantity
-- `DELETE /api/v1/cart/items/:id` - Remove item
+For API documentation, visit http://localhost:3000/api/docs when the backend is running.
 
 ## Database Schema
 
