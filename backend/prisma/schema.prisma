@@ -352,6 +352,8 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+  PARTIAL_REFUND
+  CANCELLED
 }
 
 model Payment {
